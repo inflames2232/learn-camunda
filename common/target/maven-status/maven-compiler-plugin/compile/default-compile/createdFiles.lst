@@ -1,0 +1,4 @@
+dto\shipment\ShipmentOrderRequest.class
+dto\shipment\ShipmentOrderResponse.class
+dto\validate\OrderRequest.class
+dto\validate\ValidatedOrderResponse.class

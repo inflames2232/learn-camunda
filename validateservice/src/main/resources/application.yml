@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: validate_service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/process-engine
+    username: postgres
+    password: westwest223
+    driver-class-name: org.postgresql.Driver
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: camunda_server
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: 'dto.validate'
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        prop:
+          one: one
+
+camunda:
+  bpm:
+    application:
+      delete-upon-undeploy: false
+      scan-for-process-definitions: false
+      deploy-changed-only: true
+      resume-previous-versions: true
+      resume-previous-by: a value
+    job-execution:
+      enabled: true
+    metrics:
+      enabled: false
+      db-reporter-activate: false
