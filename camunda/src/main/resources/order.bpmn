@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:tns="http://bpmn.io/schema/bpmn" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Definitions_0kyudci" name="" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.4">
+  <bpmn:message id="Message_1rob3jb" name="Message_ValidateOrder" />
+  <bpmn:message id="Message_1yy3bq2" name="Message_ShipmentOrder" />
+  <bpmn:process id="OrderLifeCycle" name="Order Life Cycle" processType="None" isClosed="false" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_OrderPlaced" name="Order placed" camunda:formKey="embedded:app:forms/createOrder.html" />
+    <bpmn:sequenceFlow id="SequenceFlow_18tvz07" sourceRef="StartEvent_OrderPlaced" targetRef="Task_ValidateOrder" />
+    <bpmn:serviceTask id="Task_ValidateOrder" name="Validate Order Service" camunda:asyncBefore="true" camunda:delegateExpression="#{validateOrderAdapter}" activiti:exclusive="true" />
+    <bpmn:sequenceFlow id="SequenceFlow_1659fyo" sourceRef="Task_ValidateOrder" targetRef="Task_Recieve_ValidatedOrder" />
+    <bpmn:receiveTask id="Task_Recieve_ValidatedOrder" name="Receive Validated Order" messageRef="Message_1rob3jb" activiti:exclusive="true" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ae612h" sourceRef="Task_Recieve_ValidatedOrder" targetRef="Task_ShipmentOrder" />
+    <bpmn:serviceTask id="Task_ShipmentOrder" name="Proceed Shipment Service" camunda:delegateExpression="#{shipmentAdapter}" activiti:exclusive="true" />
+    <bpmn:sequenceFlow id="SequenceFlow_0hgs1id" sourceRef="Task_ShipmentOrder" targetRef="Task_Recieve_ShipmentOrder" />
+    <bpmn:receiveTask id="Task_Recieve_ShipmentOrder" name="Recieve Shipment Order" messageRef="Message_1yy3bq2" activiti:exclusive="true" />
+    <bpmn:endEvent id="EndEvent_1a6kl13" name="End" />
+    <bpmn:sequenceFlow id="SequenceFlow_1a8ejr6" sourceRef="Task_Recieve_ShipmentOrder" targetRef="IntermediateThrowEvent_15ci4ll" />
+    <bpmn:sequenceFlow id="SequenceFlow_0jsjybk" sourceRef="IntermediateThrowEvent_15ci4ll" targetRef="EndEvent_1a6kl13" />
+    <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_15ci4ll">
+      <bpmn:timerEventDefinition id="IntermediateThrowEvent_15ci4ll_ED_1">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:textAnnotation id="TextAnnotation_1mmcs55">
+      <bpmn:text>Place order</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1jnqhuf" associationDirection="None" sourceRef="StartEvent_OrderPlaced" targetRef="TextAnnotation_1mmcs55" />
+    <bpmn:textAnnotation id="TextAnnotation_0ybe38z">
+      <bpmn:text>Kafka</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1gmfv0l" associationDirection="None" sourceRef="Task_ValidateOrder" targetRef="TextAnnotation_0ybe38z" />
+    <bpmn:textAnnotation id="TextAnnotation_120s437">
+      <bpmn:text>Kafka</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_09nhvry" associationDirection="None" sourceRef="Task_ShipmentOrder" targetRef="TextAnnotation_120s437" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram-_1" name="New Diagram" documentation="background=#FFFFFF;count=1;horizontalcount=1;orientation=0;width=842.4;height=1195.2;imageableWidth=832.4;imageableHeight=1185.2;imageableX=5.0;imageableY=5.0">
+    <bpmndi:BPMNPlane bpmnElement="OrderLifeCycle">
+      <bpmndi:BPMNShape id="Shape-StartEvent_OrderPlaced" bpmnElement="StartEvent_OrderPlaced">
+        <dc:Bounds x="164" y="224" width="32" height="32" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="148" y="271" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-TextAnnotation_1mmcs55" bpmnElement="TextAnnotation_1mmcs55">
+        <dc:Bounds x="132" y="155" width="100" height="30" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="30" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-Task_ValidateOrder" bpmnElement="Task_ValidateOrder">
+        <dc:Bounds x="272" y="202" width="100" height="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="80" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-TextAnnotation_0ybe38z" bpmnElement="TextAnnotation_0ybe38z">
+        <dc:Bounds x="272" y="129" width="100" height="30" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="30" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-Task_Recieve_ValidatedOrder" bpmnElement="Task_Recieve_ValidatedOrder">
+        <dc:Bounds x="423" y="202" width="100" height="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="80" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-Task_ShipmentOrder" bpmnElement="Task_ShipmentOrder">
+        <dc:Bounds x="565" y="202" width="100" height="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="80" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-Task_Recieve_ShipmentOrder" bpmnElement="Task_Recieve_ShipmentOrder">
+        <dc:Bounds x="710" y="202" width="100" height="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="80" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-EndEvent_1a6kl13" bpmnElement="EndEvent_1a6kl13">
+        <dc:Bounds x="922" y="224" width="32" height="32" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="928" y="265" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-TextAnnotation_120s437" bpmnElement="TextAnnotation_120s437">
+        <dc:Bounds x="538" y="129" width="100" height="30" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="100" height="30" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-IntermediateThrowEvent_15ci4ll" bpmnElement="IntermediateThrowEvent_15ci4ll">
+        <dc:Bounds x="842" y="224" width="32" height="32" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="0" width="32" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1a8ejr6" bpmnElement="SequenceFlow_1a8ejr6" sourceElement="Task_Recieve_ShipmentOrder" targetElement="IntermediateThrowEvent_15ci4ll">
+        <di:waypoint x="810" y="242" />
+        <di:waypoint x="842" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1659fyo" bpmnElement="SequenceFlow_1659fyo" sourceElement="Task_ValidateOrder" targetElement="Task_Recieve_ValidatedOrder">
+        <di:waypoint x="372" y="242" />
+        <di:waypoint x="423" y="242" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_18tvz07" bpmnElement="SequenceFlow_18tvz07" sourceElement="StartEvent_OrderPlaced" targetElement="Task_ValidateOrder">
+        <di:waypoint x="196" y="240" />
+        <di:waypoint x="272" y="242" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_0hgs1id" bpmnElement="SequenceFlow_0hgs1id" sourceElement="Task_ShipmentOrder" targetElement="Task_Recieve_ShipmentOrder">
+        <di:waypoint x="665" y="242" />
+        <di:waypoint x="710" y="242" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_0jsjybk" bpmnElement="SequenceFlow_0jsjybk" sourceElement="IntermediateThrowEvent_15ci4ll" targetElement="EndEvent_1a6kl13">
+        <di:waypoint x="874" y="240" />
+        <di:waypoint x="922" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1ae612h" bpmnElement="SequenceFlow_1ae612h" sourceElement="Task_Recieve_ValidatedOrder" targetElement="Task_ShipmentOrder">
+        <di:waypoint x="523" y="242" />
+        <di:waypoint x="565" y="242" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Association_09nhvry" bpmnElement="Association_09nhvry" sourceElement="Task_ShipmentOrder" targetElement="TextAnnotation_120s437">
+        <di:waypoint x="603.9795918367347" y="202" />
+        <di:waypoint x="592.1326530612245" y="159" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Association_1gmfv0l" bpmnElement="Association_1gmfv0l" sourceElement="Task_ValidateOrder" targetElement="TextAnnotation_0ybe38z">
+        <di:waypoint x="322" y="202" />
+        <di:waypoint x="322" y="159" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Association_1jnqhuf" bpmnElement="Association_1jnqhuf" sourceElement="StartEvent_OrderPlaced" targetElement="TextAnnotation_1mmcs55">
+        <di:waypoint x="180.45695638238206" y="224.00652661662843" />
+        <di:waypoint x="181.57142857142856" y="185" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-1" y="-1" width="-1" height="-1" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
